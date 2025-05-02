@@ -21,7 +21,7 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHwyNTUuMTJ8MC4wMHwxNzAuMDg=)'>
-<rect x='0.000000000000032' y='0.00' width='255.12' height='170.08' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+<rect x='0.00' y='0.00' width='255.12' height='170.08' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
 </g>
 <defs>
   <clipPath id='cpMjcuNDJ8MjQ5LjY0fDUuNDh8MTQzLjk3'>
@@ -240,6 +240,6 @@
 <text x='180.62' y='153.91' text-anchor='middle' style='font-size: 7.00px;fill: #4D4D4D; font-family: "Arial";' textLength='7.79px' lengthAdjust='spacingAndGlyphs'>10</text>
 <text x='222.70' y='153.91' text-anchor='middle' style='font-size: 7.00px;fill: #4D4D4D; font-family: "Arial";' textLength='7.79px' lengthAdjust='spacingAndGlyphs'>20</text>
 <text x='138.53' y='163.13' text-anchor='middle' style='font-size: 7.00px; font-family: "Arial";' textLength='30.82px' lengthAdjust='spacingAndGlyphs'>Angles (°)</text>
-<text transform='translate(10.49,74.72) rotate(-90)' text-anchor='middle' style='font-size: 7.00px; font-family: "Arial";' textLength='44.75px' lengthAdjust='spacingAndGlyphs'>probability (%)</text>
+<text transform='translate(10.49,74.72) rotate(-90)' text-anchor='middle' style='font-size: 7.00px; font-family: "Arial";' textLength='108.18px' lengthAdjust='spacingAndGlyphs'>Probability of Biased Condition (%)</text>
 </g>
 </svg>

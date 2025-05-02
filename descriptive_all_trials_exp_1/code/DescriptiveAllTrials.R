@@ -22,6 +22,8 @@
 #install.packages("modi")
 #install.packages("svglite")
 #install.packages("showtext")
+#install.packages("lme4")  
+#install.packages("boot")  
 
 library(car)
 library(ggplot2)
@@ -37,6 +39,8 @@ library(broom.mixed)
 library(modi)
 library(svglite)
 library(showtext)
+library(lme4)
+library(boot)
 
 
 # Functions ----
@@ -262,7 +266,7 @@ plot <- plot +
   geom_point( aes(x = 14, y = 3), size = 1, colour ="light blue") +
   geom_point( aes(x = 14, y = 1.5), size = 1, colour ="blue") +
   
-  labs(x = "Angles (°)", y = "probability (%)") +theme(
+  labs(x = "Angles (°)", y = "Probability of Biased Condition (%)") +theme(
     panel.background = element_blank(),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
@@ -279,3 +283,181 @@ print(plot)
 # save the plot
 ggsave("plots/GazeShiftDifferencesRandInterceptExp1.svg", plot, device = "svg",
        width = 9, height = 6, units = "cm")
+
+
+
+# shift size inference statistics --------------------------------------------
+# Take it positive if the shift is in the curve and negativ outside the curve
+# The peak of the curve (modus) is is left condition between the second and third position from the edge
+# Exclude these two positions as we have no exact hypotheses what should happen close to the peak 
+# Take on the left side the first value negative and the fourth or higher positive
+# As the hypothesis is that the shift is in the direction of the distribution's peak's area
+# As the right distribution is mirrored to the left distribution, we can use the same logic
+#shift size hierarchical ----------------------------------------------------
+## merge all data from the last4blocks to one dataframe
+start_index <- 192
+end_index <- 320
+
+#initialize list
+all_data_left_exp1 <- list()
+
+#left: summing up all deviation in the direction within the distribution
+for (bouncing_position in c(0, 3, 4, 5, 6)) {
+  data <- read_excel(paste0("data/datafileforR_", bouncing_position, "_left.xlsx"))
+  data_clean <- remove_outliers(data)
+  subset_last4_blocks <- subset(data_clean, block > start_index) #select the Last4blocks
+  data_clean <- subset(subset_last4_blocks, block < end_index)
+  # if bouncing_position is 0, 1 change sign (positiv if within the distribution)
+  if (bouncing_position == 0 | bouncing_position == 1) {
+    data_clean$y <- -data_clean$y
+  }
+  # Store cleaned data in the list
+  all_data_left_exp1[[bouncing_position + 1]] <- data_clean  # Index starts from 1 in R
+}
+
+# Merge all data into one final data frame
+final_data_left_exp1 <- do.call(rbind, all_data_left_exp1)
+
+#add column left_right
+final_data_left_exp1$left_right <- "left"
+
+#initialize list for right distribution
+all_data_right_exp1 <- list()
+
+#right: summing up all deviation in the direction within the distribution
+for (bouncing_position in c(3, 4, 5, 6, 9)) {
+  data <- read_excel(paste0("data/datafileforR_", bouncing_position, "_right.xlsx"))
+  data_clean <- remove_outliers(data)
+  subset_last4_blocks <- subset(data_clean, block > start_index) #select the Last4blocks
+  data_clean <- subset(subset_last4_blocks, block < end_index)  
+  # if not bouncing_position is 8, 9 change signsuch that it is positiv if it is within the distribution)
+  if (!(bouncing_position %in% c(8, 9))) {
+    data_clean$y <- -data_clean$y
+  }
+  # Store cleaned data in the list
+  all_data_right_exp1[[bouncing_position + 1]] <- data_clean  # Index starts from 1 in R
+}
+
+# Merge all data into one final data frame
+final_data_right_exp1 <- do.call(rbind, all_data_right_exp1)
+#add column left_right
+final_data_right_exp1$left_right <- "right"
+
+#merge datafile left right
+final_data_all_exp1 <- rbind(final_data_left_exp1, final_data_right_exp1)
+
+# Fit the hierarchical linear mixed-effects model using lme4 left and right
+model_mean_exp1 <- lmer(y ~ 1 + (1 | index), 
+                        data = final_data_all_exp1, REML = FALSE)
+tab_model(model_mean_exp1)
+summary(model_mean_exp1)
+
+#check normality 
+hist(final_data_all_exp1$y)
+hist(resid(model_mean_exp1)) #normality is not violated (bootstrapp bias 0)
+
+boot_lme_exp1 <- function(data, indices) {
+  resampled_data <- data[indices, ]  # Bootstrap sample
+  
+  new_model <- try(lme(y ~ 1,
+                       random = ~1 | index, 
+                       data = final_data_all_exp1), silent = TRUE)
+  
+  if (inherits(new_model, "try-error")) {
+    return(rep(NA, length(fixef(model_mean_left_exp1))))  # Return NA if model fails
+  } else {
+    return(fixef(new_model))  # Extract fixed effects (coefficients)
+  }
+}
+# Perform bootstrapping with 5000 resamples
+set.seed(123)
+boot_results_exp1 <- boot(data = final_data_all_exp1, statistic = boot_lme_exp1, R = 5000)
+
+# Print bootstrapped results
+print(boot_results_exp1)
+#Bootstrap Statistics :
+#  original  bias    std. error
+#t1* 1.544446       0           0
+
+# Compute confidence intervals for bootstrapped estimates
+boot.ci(boot_results_exp1, type = "perc") #CI are smaller but now differences in interpretation
+#[1] "All values of t are equal to  1.54444567376178 \n Cannot calculate confidence intervals"
+#NULL
+
+
+
+
+### now the same for the warm up trials ----
+#initialize list
+all_data_exp1_warm_up <- list()
+start_index <- 0
+end_index <- 60
+
+#Bounce positions 0 to 9 in the warm Up trials with the condition afterwards of a central tendency to the left / right
+conditions <- c("left", "right")
+for (condition in conditions) {
+  for (bounce_positions in c(0,3,4,5,6,9)) {
+    data <- read_excel(paste0("data/datafileforR_", bounce_positions, "_", condition, "WarmUp.xlsx"))
+    data_clean <- remove_outliers(data)
+    subset_warm_up_blocks <- subset(data_clean, block > start_index) #select the warm up blocks
+    data_clean <- subset(subset_warm_up_blocks, block < end_index)
+    data_clean$left_right <- condition
+    if (condition == "left") {
+      if (bounce_positions == 0 ) {
+        data_clean$y <- -data_clean$y
+      }
+    } else {
+      if (!(bounce_positions ==  9)) {
+        data_clean$y <- -data_clean$y
+      }
+    }
+    # Store cleaned data in the list
+    all_data_exp1_warm_up[[bouncing_position + 1]] <- data_clean  # Index starts from 1 in R
+  }}
+
+# Merge all data into one final data frame
+final_data_exp1_warm_up <- do.call(rbind, all_data_exp1_warm_up)
+
+# Fit the hierarchical linear mixed-effects model using lme4
+model_mean_exp1_warm_up <- lmer(y ~ 1 + (1 | index), 
+                                data = final_data_exp1_warm_up, REML = FALSE)
+tab_model(model_mean_exp1_warm_up)
+summary(model_mean_exp1_warm_up)
+
+#check normality 
+hist(final_data_exp1_warm_up$y)
+hist(resid(model_mean_exp1_warm_up)) #-> normality is violated
+
+# Define a function for bootstrapping to check if the model is robust
+boot_lmer_exp1 <- function(data, indices) {
+  resampled_data <- data[indices, ]  # Bootstrap sample
+  
+  new_model <- try(lmer(y ~ 1 + (1 | index), 
+                        data = resampled_data, REML = FALSE), silent = TRUE)
+  
+  if (inherits(new_model, "try-error")) {
+    return(rep(NA, length(fixef(model_mean_left_exp1))))  # Return NA if model fails
+  } else {
+    return(fixef(new_model))  # Extract fixed effects (coefficients)
+  }
+}
+
+# Perform bootstrapping with 5000 resamples
+set.seed(123)
+boot_results_exp1_warm_up <- boot(data = final_data_exp1_warm_up, statistic = boot_lmer_exp1, R = 5000)
+
+# Print bootstrapped results
+print(boot_results_exp1_warm_up)
+#Bootstrap Statistics :
+#  original      bias    std. error
+#t1* 0.03909102 0.006518897     0.44008
+
+# Compute confidence intervals for bootstrapped estimates
+boot.ci(boot_results_exp1_warm_up, type = "perc") #CI are smaller but now differences in interpretation
+#Intervals : 
+#  Level     Percentile     
+#95%   (-0.7951,  0.9074 )  
+
+# Export shift_values to a csv file to ../DescriptiveAllTrialsexp2/data
+write.csv(final_data_all_exp1, file = "../descriptive_all_trials_exp_2/data/final_data_all_exp1.csv")
+
