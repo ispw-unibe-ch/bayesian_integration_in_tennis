@@ -266,7 +266,7 @@ plot <- plot +
   geom_point( aes(x = 14, y = 3), size = 1, colour ="light blue") +
   geom_point( aes(x = 14, y = 1.5), size = 1, colour ="blue") +
   
-  labs(x = "Angles (°)", y = "Probability of Biased Condition (%)") +theme(
+  labs(x = "Angle (°)", y = "Probability of Biased Condition (%)") +theme(
     panel.background = element_blank(),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),

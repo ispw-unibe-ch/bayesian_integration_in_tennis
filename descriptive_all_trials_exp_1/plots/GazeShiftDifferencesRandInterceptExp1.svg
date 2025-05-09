@@ -239,7 +239,7 @@
 <text x='138.53' y='153.91' text-anchor='middle' style='font-size: 7.00px;fill: #4D4D4D; font-family: "Arial";' textLength='3.90px' lengthAdjust='spacingAndGlyphs'>0</text>
 <text x='180.62' y='153.91' text-anchor='middle' style='font-size: 7.00px;fill: #4D4D4D; font-family: "Arial";' textLength='7.79px' lengthAdjust='spacingAndGlyphs'>10</text>
 <text x='222.70' y='153.91' text-anchor='middle' style='font-size: 7.00px;fill: #4D4D4D; font-family: "Arial";' textLength='7.79px' lengthAdjust='spacingAndGlyphs'>20</text>
-<text x='138.53' y='163.13' text-anchor='middle' style='font-size: 7.00px; font-family: "Arial";' textLength='30.82px' lengthAdjust='spacingAndGlyphs'>Angles (°)</text>
+<text x='138.53' y='163.13' text-anchor='middle' style='font-size: 7.00px; font-family: "Arial";' textLength='27.32px' lengthAdjust='spacingAndGlyphs'>Angle (°)</text>
 <text transform='translate(10.49,74.72) rotate(-90)' text-anchor='middle' style='font-size: 7.00px; font-family: "Arial";' textLength='108.18px' lengthAdjust='spacingAndGlyphs'>Probability of Biased Condition (%)</text>
 </g>
 </svg>
