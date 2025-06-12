@@ -279,6 +279,84 @@ plot <- plot +
   scale_x_continuous(limits = c(-24, 24))  # Set x-axis limits
 print(plot)
 
+# Get x and y for the 5th entry (left and right)
+x_left <- data2_left$bouncing_position_shifted_left[5]
+y_left <- data2_left$probability_left[5]
+x_right <- data2_right$bouncing_position_shifted_right[5]
+y_right <- data2_right$probability_right[5]
+
+# Calculate midpoint y
+y_mid <- (y_left + y_right) / 2
+
+# Add elbow with dashed line (horizontal in the middle)
+plot <- plot +
+  # Vertical from left point to midpoint y
+  geom_segment(
+    aes(x = x_left, y = y_left, xend = x_left, yend = y_mid),
+    linetype = "dotted",
+    colour = "orange", size = 0.4
+  ) +
+  # Horizontal from left x to right x, at y_mid
+  geom_segment(
+    aes(x = x_left, y = y_mid, xend = x_right, yend = y_mid),
+    linetype = "solid",
+    colour = "orange", size = 0.4
+  ) +
+  # Vertical from midpoint y to right point
+  geom_segment(
+    aes(x = x_right, y = y_mid, xend = x_right, yend = y_right),
+    linetype = "dotted",
+    colour = "orange", size = 0.4
+  )
+print(plot)
+
+# Get x and y for the 6th entry (left and right)
+x_left_6 <- data2_left$bouncing_position_shifted_left[6]
+y_left_6 <- data2_left$probability_left[6]
+x_right_6 <- data2_right$bouncing_position_shifted_right[6]
+y_right_6 <- data2_right$probability_right[6]
+
+# Calculate midpoint y
+y_mid_6 <- (y_left_6 + y_right_6) / 2
+
+# Add elbow with dashed line (horizontal in the middle)
+plot <- plot +
+  # Vertical from left point to midpoint y
+  geom_segment(
+    aes(x = x_left_6, y = y_left_6, xend = x_left_6, yend = y_mid_6),
+    linetype = "dotted",
+    colour = "orange", size = 0.4
+  ) +
+  # Horizontal from left x to right x, at y_mid
+  geom_segment(
+    aes(x = x_left_6, y = y_mid_6, xend = x_right_6, yend = y_mid_6),
+    linetype = "solid",
+    colour = "orange", size = 0.4
+  ) +
+  # Vertical from midpoint y to right point
+  geom_segment(
+    aes(x = x_right_6, y = y_mid_6, xend = x_right_6, yend = y_right_6),
+    linetype = "dotted",
+    colour = "orange", size = 0.4
+  )
+print(plot)
+
+
+# For position 6
+plot <- plot +
+  annotate(
+    "text",
+    x = x_right_6 + 1,  # shift to the right
+    y = y_mid_6,
+    label = "Δright-Δleft",
+    hjust = 0,
+    vjust = 0.5,
+    size = 3,
+    colour = "orange",
+  )
+
+print(plot)
+
 # save the plot
 ggsave("plots/GazeShiftDifferencesRandInterceptExp2.svg", plot, device = "svg",
        width = 9, height = 6, units = "cm")
