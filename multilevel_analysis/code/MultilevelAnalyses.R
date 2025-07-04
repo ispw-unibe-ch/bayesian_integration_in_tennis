@@ -7,6 +7,10 @@
 # Based on r version 4.3.2
 #---------------------------------------------------------------
 
+#Please note that if you want to analyse the first experiment, you have to change 
+#the datafile name in the import data section and the plot names in the plots section.
+#Do this in the following lines (103-109), 173
+
 # Packages ----
 #---------------------------------------------------------------
 #install packages recommended by Field (2012)
@@ -166,7 +170,7 @@ qqnorm(log_model3$residuals)
 #Explicit effects
 # Import data ----
 #---------------------------------------------------------------
-datafile_for_r <- read_excel("data/JudgementsDifferencesexp2.xlsx") #To analyse the first experiment change the name "data/JudgementsDifferencesexp1.xlsx
+datafile_for_r <- read_excel("data/JudgementsDifferencesexp1.xlsx") #To analyse the first experiment change the name "data/JudgementsDifferencesexp1.xlsx
 View(datafile_for_r)
 df_explicit <- datafile_for_r
 View(df_explicit)
